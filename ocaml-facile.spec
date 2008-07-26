@@ -1,14 +1,14 @@
 Summary:	Functional Constraint Library implemented in Objective Caml
-Name:		facile
+Name:		ocaml-facile
 Version:	1.1
 Release:	1
 License:	LGPL
 Group:		Libraries
-Source0:	http://www.recherche.enac.fr/opti/facile/distrib/%{name}-%{version}.tar.gz
+Source0:	http://www.recherche.enac.fr/opti/facile/distrib/facile-%{version}.tar.gz
 # Source0-md5:	ab673e1fc0859a42bcb639a02c2d7e9e
 URL:		http://www.recherche.enac.fr/opti/facile/
 BuildRequires:	ocaml >= 3.02
-Requires:	ocaml >= 3.02
+%requires_eq	ocaml-runtime
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -31,9 +31,10 @@ language. For a more complete description, you may consult the preface
 and foreword of the online documentation
 
 %prep
-%setup -q
+%setup -q -n facile-%{version}
 
 %build
+# use ./configure because of 'Unknown option "LDFLAGS=-Wl,--as-needed -Wl,-z,relro -Wl,-z,-combreloc "
 ./configure
 
 %{__make}
