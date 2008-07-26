@@ -41,7 +41,7 @@ and foreword of the online documentation
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
-cp src/facile.cmi src/facile.cma src/facile.cmxa src/facile.a $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
+install src/facile.cmi src/facile.cma src/facile.cmxa src/facile.a $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -49,4 +49,5 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc LICENSE README
+%dir %{_libdir}/ocaml/facile
 %{_libdir}/ocaml/facile/*
