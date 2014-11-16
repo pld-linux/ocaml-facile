@@ -1,7 +1,7 @@
 Summary:	Functional Constraint Library implemented in Objective Caml
 Name:		ocaml-facile
 Version:	1.1
-Release:	3
+Release:	4
 License:	LGPL
 Group:		Libraries
 Source0:	http://www.recherche.enac.fr/opti/facile/distrib/facile-%{version}.tar.gz
