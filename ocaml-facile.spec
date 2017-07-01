@@ -1,3 +1,12 @@
+#
+# Conditional build:
+%bcond_without	ocaml_opt	# skip building native optimized binaries (bytecode is always built)
+
+# not yet available on x32 (ocaml 4.02.1), update when upstream will support it
+%ifnarch %{ix86} %{x8664} arm aarch64 ppc sparc sparcv9
+%undefine	with_ocaml_opt
+%endif
+
 Summary:	Functional Constraint Library implemented in Objective Caml
 Name:		ocaml-facile
 Version:	1.1.3
@@ -6,10 +15,18 @@ License:	LGPL
 Group:		Libraries
 Source0:	http://opti.recherche.enac.fr/facile/distrib/facile-%{version}.tar.gz
 # Source0-md5:	172c4fbea636a8fa575b988390639d8d
+Patch0:		opt.patch
 URL:		http://www.recherche.enac.fr/opti/facile/
 BuildRequires:	ocaml >= 3.02
 %requires_eq	ocaml-runtime
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		debug_package	%{nil}
+%if %{without ocaml_opt}
+%define		no_install_post_strip	1
+# no opt means no native binary, stripping bytecode breaks such programs
+%define		_enable_debug_packages	0
+%endif
 
 %description
 FaCiLe is a constraint programming library on integer and integer set
@@ -32,17 +49,23 @@ and foreword of the online documentation
 
 %prep
 %setup -q -n facile-%{version}
+%patch0 -p1
 
 %build
 # use ./configure because of 'Unknown option "LDFLAGS=-Wl,--as-needed -Wl,-z,relro -Wl,-z,-combreloc "
 ./configure
 
-%{__make}
+%{__make} -C src all %{?with_ocaml_opt:opt} \
+	CC="%{__cc} %{rpmcflags} -fPIC"
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
-install src/facile.cmi src/facile.cma src/facile.cmxa src/facile.a $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
+
+install src/facile.cmi src/facile.cma $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
+%if %{with ocaml_opt}
+install src/facile.cmxa src/facile.a $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -51,4 +74,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc LICENSE README
 %dir %{_libdir}/ocaml/facile
-%{_libdir}/ocaml/facile/*
+%{_libdir}/ocaml/facile/*.cma
+%{_libdir}/ocaml/facile/*.cmi
+%if %{with ocaml_opt}
+%{_libdir}/ocaml/facile/*.a
+%{_libdir}/ocaml/facile/*.cmxa
+%endif
