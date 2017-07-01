@@ -1,9 +1,11 @@
 --- facile-1.1.3/src/Makefile~	2016-12-15 17:10:07.000000000 +0100
 +++ facile-1.1.3/src/Makefile	2017-07-01 19:37:40.399941508 +0200
-@@ -17,6 +17,7 @@
+@@ -17,7 +17,8 @@
+ CSTRCMX = $(CSTR:.ml=.cmx)
  
  # Default target: libraries and toplevel
- all : facile.cma facile.cmxa facile
+-all : facile.cma facile.cmxa facile
++all : facile.cma facile
 +opt : facile.cmxa
  
  # Libraries
