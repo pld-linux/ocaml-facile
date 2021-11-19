@@ -1,17 +1,18 @@
 #
 # Conditional build:
-%bcond_without	ocaml_opt	# skip building native optimized binaries (bytecode is always built)
+%bcond_without	ocaml_opt	# native optimized binaries (bytecode is always built)
 
 # not yet available on x32 (ocaml 4.02.1), update when upstream will support it
-%ifnarch %{ix86} %{x8664} arm aarch64 ppc sparc sparcv9
+%ifnarch %{ix86} %{x8664} %{arm} aarch64 ppc sparc sparcv9
 %undefine	with_ocaml_opt
 %endif
 
 Summary:	Functional Constraint Library implemented in Objective Caml
+Summary(pl.UTF-8):	Biblioteka ograniczeń funkcyjnych dla OCamla
 Name:		ocaml-facile
 Version:	1.1.3
-Release:	3
-License:	LGPL
+Release:	4
+License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://opti.recherche.enac.fr/facile/distrib/facile-%{version}.tar.gz
 # Source0-md5:	172c4fbea636a8fa575b988390639d8d
@@ -44,15 +45,47 @@ well as native code compilation efficiency, garbage collection and
 replay debugger, all features of OCaml (among many others) that allow
 to prototype and experiment quickly: modeling, data processing and
 interface are implemented with the same powerful and efficient
-language. For a more complete description, you may consult the preface
-and foreword of the online documentation
+language.
+
+%description -l pl.UTF-8
+FaCiLe to biblioteka programowania ograniczeń na liczbach całkowitych
+i skończonych zbiorach liczb całkowitych. Funkcjonalność obejmuje
+tworzenie i operowanie na zmiennych skończonych, wyrażenia i stałe
+arytmetyczne (także nieliniowe), wbudowane ograniczenia (różnica,
+liczność, sortowanie itp.) oraz szukanie i optymalizację celu. FaCiLe
+pozwala także łatwo tworzyć zdefiniowane przez użytkownika
+ograniczenia i cele (w tym rekurencyjne), wszędzie wykorzystując
+ocamlowe funkcje wyższego rzędu, aby udostępnić użytkownikowi
+prosty i elastyczny interfejs. Jako że FaCiLe jest biblioteką dla
+OCamla, a nie innego języka, użytkownik korzysta z wywodzenia typów i
+silnego typowania, wysokopoziomowej abstrakcji, systemu modułów i
+obiektów, a także wydajności kompilowania do kodu natywnego,
+odśmiecania i debuggera - wszystkich cehc OCamla, które pozwalają
+szybko prototypować i eksperymentować: modelowanie, przetwarzanie
+danych i interfejs są zaimplementowane w tym samym potężnym i wydajnym
+języku.
+
+%package devel
+Summary:	Functional Constraint Library implemented in Objective Caml - development part
+Summary(pl.UTF-8):	Biblioteka ograniczeń funkcyjnych dla OCamla - część programistyczna
+Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
+%requires_eq	ocaml
+
+%description devel
+This package contains files needed to develop OCaml programs using
+FaCiLe library.
+
+%description devel -l pl.UTF-8
+Pakiet ten zawiera pliki niezbędne do tworzenia programów w OCamlu
+używających biblioteki FaCiLe.
 
 %prep
 %setup -q -n facile-%{version}
 %patch0 -p1
 
 %build
-# use ./configure because of 'Unknown option "LDFLAGS=-Wl,--as-needed -Wl,-z,relro -Wl,-z,-combreloc "
+# not autoconf configure
 ./configure
 
 %{__make} -C src all %{?with_ocaml_opt:opt} \
@@ -62,9 +95,9 @@ and foreword of the online documentation
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
 
-install src/facile.cmi src/facile.cma $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
+cp -p src/facile.cmi src/facile.cma $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
 %if %{with ocaml_opt}
-install src/facile.cmxa src/facile.a $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
+cp -p src/facile.cmxa src/facile.a $RPM_BUILD_ROOT%{_libdir}/ocaml/facile
 %endif
 
 %clean
@@ -75,6 +108,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE README
 %dir %{_libdir}/ocaml/facile
 %{_libdir}/ocaml/facile/*.cma
+
+%files devel
+%defattr(644,root,root,755)
 %{_libdir}/ocaml/facile/*.cmi
 %if %{with ocaml_opt}
 %{_libdir}/ocaml/facile/*.a
