@@ -82,7 +82,7 @@ używających biblioteki FaCiLe.
 
 %prep
 %setup -q -n facile-%{version}
-%patch0 -p1
+%patch -P0 -p1
 
 %build
 # not autoconf configure
